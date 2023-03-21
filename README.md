@@ -22,3 +22,6 @@ Monte carlo runs with estimation of b1, b2 of second order plant, basal level an
 
 ## secondorderdynamics_robust.m
 Monte carlo runs with estimation of b1, b2 of second order plant and input impulses from synthetic data corrupted with outliers. Corresponds to the experiment in Section 4.1.4 in the article.
+
+## RobustRisk
+Modified code from https://github.com/Muhammad-Osama/robustRisk, "Robust Risk Minimization for Statistical Learning", Muhammad Osama, Dave Zachariah, Peter Stoica. https://ieeexplore.ieee.org/abstract/document/9265228
