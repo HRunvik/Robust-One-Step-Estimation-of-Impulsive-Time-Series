@@ -1,8 +1,6 @@
 % Parameter and input estimation for first order system
 % Monte Carlo runs with synthetic data with added noise
 
-rng(12)
-
 n_runs=400; % number of runs
 
 n_impulses=3;
@@ -26,9 +24,9 @@ ressumest=zeros(1,n_runs);
 nstepmin_= zeros(1,n_runs);
 ressum_min = zeros(1,n_runs);
 ressum_minDelta = zeros(1,n_runs);
-delta_est = zeros(1,n_runs);
 
 for k=1:n_runs
+    rng((k-1)*5)
     %% Base parameters
     a1= rand(1)+min_a1;
     a2= 2*a1; %not used
@@ -36,7 +34,7 @@ for k=1:n_runs
     [y_nonoise,t_sampled,x,t,dSeq] = generatedata(a1,a2,n_impulses,dmin,dmax,Tmin,Tmax,0.02,delta_t_sampled,true);
     gaussiannoise = noisestd*randn(size(t_sampled));
     y = y_nonoise+gaussiannoise';
-    tk = t_sampled(2:end-1);
+    tk = t_sampled(2:end);
     m = length(y);
     n = length(tk);
     options = optimset('lsqlin');
@@ -83,12 +81,11 @@ for k=1:n_runs
     ressumDer = (ressum(3:end)-ressum(1:end-2))/(2*a_delta);
     A = find(ressumDer>0,1);
     ressum(A:end) = NaN;
-    %ressum(sum(sparsity,2)>=0.5*numel(t_sampled))=NaN;
 
     ressum_min(k) = min(ressum_); % impulse time is known
     ressum_minDelta(k) =a1 - a1_range(ressum_== ressum_min(k)); % estimation error when impulse time is known
     
-    ntstep=-(ressum(2:end-1)+noisestd^2)./(ressum(3:end)-ressum(1:end-2))*2*a_delta;
+    ntstep=-(ressum(2:end-1)+(2*noisestd)^2)./(ressum(3:end)-ressum(1:end-2))*2*a_delta;
     ntstep_=-ressum_(2:end-1)./(ressum_(3:end)-ressum_(1:end-2))*2*a_delta;
     ntstep_(ntstep_<0)=NaN;
 
@@ -100,7 +97,6 @@ for k=1:n_runs
     
     deltabase(k)=a1-a1_range(minidx);
     deltaadj(k)=a1-a1_range(minidx)-nstepmin; % error with unknown impulse times
-    delta_est(k)=a1-(a1_range(minidx_)+nstepmin_(k)); % error with one step and known impulse time. for some reason this estimate is a lot worse
     
 end
 %%
